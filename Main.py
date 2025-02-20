@@ -8,7 +8,6 @@ SQ_SIZE = HEIGHT // DIMENSION
 IMAGES = {}
 MAX_FPS = 15
 
-
 def main():
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
