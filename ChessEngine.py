@@ -20,6 +20,14 @@ class GameState():
         self.whiteToMove = not self.whiteToMove
         self.moves.append(move)
 
+    def undoMove(self):
+        if len(self.moves) == 0:
+            return
+        move = self.moves.pop()
+        self.board[move.startRow][move.startCol] = move.pieceMoved
+        self.board[move.endRow][move.endCol] = move.pieceCaptured
+        self.whiteToMove = not self.whiteToMove
+
 class Move():
 
     ranksToRows = {"1" : 7, "2" : 6, "3" : 5, "4" : 4, "5" : 3, "6" : 2, "7" : 1, "8" : 0}
