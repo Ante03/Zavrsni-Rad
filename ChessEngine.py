@@ -17,6 +17,7 @@ class GameState():
 
     def makeMove(self, move):
         self.pawnMove(move)
+        self.knightMove(move)
         if move.moveId in self.legalMoves:
             self.board[move.startRow][move.startCol] = "--"
             self.board[move.endRow][move.endCol] = move.pieceMoved
@@ -35,38 +36,75 @@ class GameState():
     def pawnMove(self, move):
         if self.whiteToMove == True:
             if move.startRow == 6 and self.board[move.startRow - 2][move.startCol] == "--":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow - 2) * 100 + move.startCol
+                legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol)
                 self.legalMoves.append(legalMove)
 
-            if move.startRow >= 1 and self.board[move.startRow - 1][move.startCol] == "--":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow - 1) * 100 + move.startCol
-                self.legalMoves.append(legalMove)
+            if move.startRow >= 1:
+                if self.board[move.startRow - 1][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol)
+                    self.legalMoves.append(legalMove)
 
-            if  move.startCol > 0 and self.board[move.startRow - 1][move.startCol - 1][0] == "b":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow - 1) * 100 + move.startCol - 1
-                self.legalMoves.append(legalMove)
+                if  move.startCol > 0 and self.board[move.startRow - 1][move.startCol - 1][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
 
-            if move.startCol < 7 and self.board[move.startRow - 1][move.startCol + 1][0] == "b":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow - 1) * 100 + move.startCol + 1
-                self.legalMoves.append(legalMove)
+                if move.startCol < 7 and self.board[move.startRow - 1][move.startCol + 1][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
 
-
-        else:
+        elif self.whiteToMove == False:
             if move.startRow == 1 and self.board[move.startRow + 2][move.startCol] == "--":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow + 2) * 100 + move.startCol
+                legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol)
                 self.legalMoves.append(legalMove)
 
-            if move.startRow <= 6 and self.board[move.startRow + 1][move.startCol] == "--":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow + 1) * 100 + move.startCol
+            if move.startRow <= 6:
+                if self.board[move.startRow + 1][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol)
+                    self.legalMoves.append(legalMove)
+
+                if  move.startCol > 0 and self.board[move.startRow + 1][move.startCol - 1][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
+
+                if  move.startCol < 7 and self.board[move.startRow + 1][move.startCol + 1][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
+
+    def knightMove(self, move):
+        if self.whiteToMove == True:
+            color = "w"
+        else:
+            color = "b"
+
+        if move.startRow > 1:
+            if move.startCol - 1 >= 0 and self.board[move.startRow - 2][move.startCol - 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol - 1)
+                self.legalMoves.append(legalMove)
+            if move.startCol + 1 <= 7 and self.board[move.startRow - 2][move.startCol + 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol + 1)
+                self.legalMoves.append(legalMove)
+        if move.startRow < 6:
+            if move.startCol - 1 >= 0 and self.board[move.startRow + 2][move.startCol - 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol - 1)
+                self.legalMoves.append(legalMove)
+            if move.startCol + 1 <= 7 and self.board[move.startRow + 2][move.startCol + 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol + 1)
+                self.legalMoves.append(legalMove)
+        if move.startRow > 0:
+            if move.startCol - 2 >= 0 and self.board[move.startRow - 1][move.startCol - 2][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 2)
+                self.legalMoves.append(legalMove)
+            if move.startCol + 2 <= 7 and self.board[move.startRow - 1][move.startCol + 2][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 2)
+                self.legalMoves.append(legalMove)
+        if move.startRow < 7:
+            if move.startCol - 2 >= 0 and self.board[move.startRow + 1][move.startCol - 2][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 2)
+                self.legalMoves.append(legalMove)
+            if move.startCol + 2 <= 7 and self.board[move.startRow + 1][move.startCol + 2][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 2)
                 self.legalMoves.append(legalMove)
 
-            if  move.startCol > 0 and self.board[move.startRow + 1][move.startCol - 1][0] == "w":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow + 1) * 100 + move.startCol - 1
-                self.legalMoves.append(legalMove)
-
-            if  move.startCol < 7 and self.board[move.startRow + 1][move.startCol + 1][0] == "w":
-                legalMove = move.startRow + move.startCol * 100 + (move.startRow + 1) * 100 + move.startCol + 1
-                self.legalMoves.append(legalMove)
 
 
 
@@ -89,7 +127,7 @@ class Move():
         self.endCol = endPoint[1]
         self.pieceMoved = board[self.startRow][self.startCol]
         self.pieceCaptured = board[self.endRow][self.endCol]
-        self.moveId = self.startRow + self.startCol * 100 + self.endRow * 100 + self.endCol
+        self.moveId = (self.startRow, self.startCol, self.endRow, self.endCol)
 
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
