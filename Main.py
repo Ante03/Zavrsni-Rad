@@ -8,17 +8,38 @@ SQ_SIZE = HEIGHT // DIMENSION
 IMAGES = {}
 MAX_FPS = 15
 
+
 def main():
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
     p.display.set_caption("Ante Chess")
     gs = ChessEngine.GameState()
     loadImages()
+    sqSelected = ()
+    playerClicks = []
     running = True
     while running:
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
+            elif event.type == p.MOUSEBUTTONDOWN:
+                location = p.mouse.get_pos()
+                col = location[0]//SQ_SIZE
+                row = location[1]//SQ_SIZE
+                if sqSelected == (row, col):
+                    sqSelected = ()
+                    playerClicks = []
+                else:
+                    sqSelected = (row, col)
+                    playerClicks.append(sqSelected)
+                if len(playerClicks) == 2:
+                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                    gs.makeMove(move)
+                    sqSelected = ()
+                    playerClicks = []
+
+
+
         drawGameState(screen, gs)
         p.display.flip()
 
