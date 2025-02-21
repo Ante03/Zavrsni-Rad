@@ -16,14 +16,25 @@ class GameState():
         self.legalMoves = []
 
     def makeMove(self, move):
-        self.pawnMove(move)
-        self.knightMove(move)
+        if (self.whiteToMove and self.board[move.startRow][move.startCol][0] != "w") or (not self.whiteToMove and self.board[move.startRow][move.startCol][0] != "b"):
+            return
+
+        self.legalMoves = []
+
+        if self.board[move.startRow][move.startCol][1] == "P":
+            self.pawnMove(move)
+        elif self.board[move.startRow][move.startCol][1] == "N":
+            self.knightMove(move)
+        elif self.board[move.startRow][move.startCol][1] == "R":
+            self.rockMove(move)
         if move.moveId in self.legalMoves:
             self.board[move.startRow][move.startCol] = "--"
             self.board[move.endRow][move.endCol] = move.pieceMoved
             self.whiteToMove = not self.whiteToMove
             self.moves.append(move)
+
         self.legalMoves = []
+
 
     def undoMove(self):
         if len(self.moves) == 0:
@@ -73,37 +84,162 @@ class GameState():
     def knightMove(self, move):
         if self.whiteToMove == True:
             color = "w"
-        else:
-            color = "b"
+            if move.startRow > 1:
+                if move.startCol - 1 >= 0 and self.board[move.startRow - 2][move.startCol - 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7 and self.board[move.startRow - 2][move.startCol + 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
+            if move.startRow < 6:
+                if move.startCol - 1 >= 0 and self.board[move.startRow + 2][move.startCol - 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7 and self.board[move.startRow + 2][move.startCol + 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
+            if move.startRow > 0:
+                if move.startCol - 2 >= 0 and self.board[move.startRow - 1][move.startCol - 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 2)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 2 <= 7 and self.board[move.startRow - 1][move.startCol + 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 2)
+                    self.legalMoves.append(legalMove)
+            if move.startRow < 7:
+                if move.startCol - 2 >= 0 and self.board[move.startRow + 1][move.startCol - 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 2)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 2 <= 7 and self.board[move.startRow + 1][move.startCol + 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 2)
+                    self.legalMoves.append(legalMove)
 
-        if move.startRow > 1:
-            if move.startCol - 1 >= 0 and self.board[move.startRow - 2][move.startCol - 1][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol - 1)
-                self.legalMoves.append(legalMove)
-            if move.startCol + 1 <= 7 and self.board[move.startRow - 2][move.startCol + 1][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol + 1)
-                self.legalMoves.append(legalMove)
-        if move.startRow < 6:
-            if move.startCol - 1 >= 0 and self.board[move.startRow + 2][move.startCol - 1][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol - 1)
-                self.legalMoves.append(legalMove)
-            if move.startCol + 1 <= 7 and self.board[move.startRow + 2][move.startCol + 1][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol + 1)
-                self.legalMoves.append(legalMove)
-        if move.startRow > 0:
-            if move.startCol - 2 >= 0 and self.board[move.startRow - 1][move.startCol - 2][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 2)
-                self.legalMoves.append(legalMove)
-            if move.startCol + 2 <= 7 and self.board[move.startRow - 1][move.startCol + 2][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 2)
-                self.legalMoves.append(legalMove)
-        if move.startRow < 7:
-            if move.startCol - 2 >= 0 and self.board[move.startRow + 1][move.startCol - 2][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 2)
-                self.legalMoves.append(legalMove)
-            if move.startCol + 2 <= 7 and self.board[move.startRow + 1][move.startCol + 2][0] != color:
-                legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 2)
-                self.legalMoves.append(legalMove)
+        elif self.whiteToMove == False:
+            color = "b"
+            if move.startRow > 1:
+                if move.startCol - 1 >= 0 and self.board[move.startRow - 2][move.startCol - 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7 and self.board[move.startRow - 2][move.startCol + 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
+            if move.startRow < 6:
+                if move.startCol - 1 >= 0 and self.board[move.startRow + 2][move.startCol - 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol - 1)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7 and self.board[move.startRow + 2][move.startCol + 1][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol + 1)
+                    self.legalMoves.append(legalMove)
+            if move.startRow > 0:
+                if move.startCol - 2 >= 0 and self.board[move.startRow - 1][move.startCol - 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 2)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 2 <= 7 and self.board[move.startRow - 1][move.startCol + 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 2)
+                    self.legalMoves.append(legalMove)
+            if move.startRow < 7:
+                if move.startCol - 2 >= 0 and self.board[move.startRow + 1][move.startCol - 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 2)
+                    self.legalMoves.append(legalMove)
+                if move.startCol + 2 <= 7 and self.board[move.startRow + 1][move.startCol + 2][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 2)
+                    self.legalMoves.append(legalMove)
+
+    def rockMove(self, move):
+        if self.whiteToMove == True:
+            color = "w"
+            for i in range(1, 8 - move.startRow):
+                if self.board[move.startRow + i][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow + i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow + i][move.startCol][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow + i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow + i][move.startCol][0] == color:
+                    break
+
+            for i in range(1, move.startRow + 1):
+                if self.board[move.startRow - i][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow - i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow - i][move.startCol][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow - i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow - i][move.startCol][0] == color:
+                    break
+
+            for i in range(1, 8 - move.startCol):
+                if self.board[move.startRow][move.startCol + i] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + i)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow][move.startCol + i][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + i)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow][move.startCol + i][0] == color:
+                    break
+
+            for i in range(1, move.startCol + 1):
+                if self.board[move.startRow][move.startCol - i] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - i)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow][move.startCol - i][0] == "b":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - i)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow][move.startCol - i][0] == color:
+                    break
+        elif self.whiteToMove == False:
+            color = "b"
+            for i in range(1, 8 - move.startRow):
+                if self.board[move.startRow + i][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow + i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow + i][move.startCol][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow + i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow + i][move.startCol][0] == color:
+                    break
+
+            for i in range(1, move.startRow + 1):
+                if self.board[move.startRow - i][move.startCol] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow - i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow - i][move.startCol][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow - i, move.startCol)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow - i][move.startCol][0] == color:
+                    break
+
+            for i in range(1, 8 - move.startCol):
+                if self.board[move.startRow][move.startCol + i] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + i)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow][move.startCol + i][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + i)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow][move.startCol + i][0] == color:
+                    break
+
+            for i in range(1, move.startCol + 1):
+                if self.board[move.startRow][move.startCol - i] == "--":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - i)
+                    self.legalMoves.append(legalMove)
+                elif self.board[move.startRow][move.startCol - i][0] == "w":
+                    legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - i)
+                    self.legalMoves.append(legalMove)
+                    break
+                elif self.board[move.startRow][move.startCol - i][0] == color:
+                    break
+
+
+
+
+
 
 
 
