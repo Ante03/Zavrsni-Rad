@@ -41,6 +41,10 @@ class GameState():
             self.board[move.endRow][move.endCol] = move.pieceMoved
             self.whiteToMove = not self.whiteToMove
             self.moves.append(move)
+            print(self.board[7][3])
+
+        else:
+            self.specificMoves(move)
 
         self.legalMoves = []
 
@@ -392,8 +396,77 @@ class GameState():
                 legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + 1)
                 self.legalMoves.append(legalMove)
 
+        elif self.whiteToMove == False:
+            color = "b"
+            if move.startRow - 1 >= 0:
+                if self.board[move.startRow - 1][move.startCol][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol)
+                    self.legalMoves.append(legalMove)
+                if move.startCol - 1 >= 0:
+                    if self.board[move.startRow - 1][move.startCol - 1][0] != color:
+                        legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 1)
+                        self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7:
+                    if self.board[move.startRow - 1][move.startCol + 1][0] != color:
+                        legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 1)
+                        self.legalMoves.append(legalMove)
 
+            if move.startRow + 1 <= 7:
+                if self.board[move.startRow + 1][move.startCol][0] != color:
+                    legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol)
+                    self.legalMoves.append(legalMove)
+                if move.startCol - 1 >= 0:
+                    if self.board[move.startRow + 1][move.startCol - 1][0] != color:
+                        legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 1)
+                        self.legalMoves.append(legalMove)
+                if move.startCol + 1 <= 7:
+                    if self.board[move.startRow + 1][move.startCol + 1][0] != color:
+                        legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 1)
+                        self.legalMoves.append(legalMove)
 
+            if move.startCol - 1 >= 0 and self.board[move.startRow][move.startCol - 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - 1)
+                self.legalMoves.append(legalMove)
+
+            if move.startCol + 1 <= 7 and self.board[move.startRow][move.startCol + 1][0] != color:
+                legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + 1)
+                self.legalMoves.append(legalMove)
+
+    def specificMoves(self, move):
+        if move.startRow == 7 and move.startCol == 4:
+            if move.endRow == 7 and move.endCol == 7 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
+                    self.board[7][5] == "--" and self.board[7][6] == "--":
+                self.board[move.startRow][move.startCol] = "--"
+                self.board[move.endRow][move.endCol] = "--"
+                self.board[7][6] = move.pieceMoved
+                self.board[7][5] = "wR"
+                self.whiteToMove = not self.whiteToMove
+                self.moves.append(move)
+            elif move.endRow == 7 and move.endCol == 0 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
+                    self.board[7][3] == "--" and self.board[7][2] == "--" and self.board[7][1] == "--":
+                self.board[move.startRow][move.startCol] = "--"
+                self.board[move.endRow][move.endCol] = "--"
+                self.board[7][2] = move.pieceMoved
+                self.board[7][3] = "wR"
+                self.whiteToMove = not self.whiteToMove
+                self.moves.append(move)
+        elif move.startRow == 0 and move.startCol == 4:
+            if move.endRow == 0 and move.endCol == 7 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
+                    self.board[0][5] == "--" and self.board[0][6] == "--":
+                self.board[move.startRow][move.startCol] = "--"
+                self.board[move.endRow][move.endCol] = "--"
+                self.board[0][6] = move.pieceMoved
+                self.board[0][5] = "bR"
+                self.whiteToMove = not self.whiteToMove
+                self.moves.append(move)
+            elif move.endRow == 0 and move.endCol == 0 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
+                    self.board[0][3] == "--" and self.board[0][2] == "--" and self.board[0][1] == "--":
+                self.board[move.startRow][move.startCol] = "--"
+                self.board[move.endRow][move.endCol] = "--"
+                self.board[0][2] = move.pieceMoved
+                self.board[0][3] = "bR"
+                self.whiteToMove = not self.whiteToMove
+                self.moves.append(move)
 
 
 
