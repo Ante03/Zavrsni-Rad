@@ -1,4 +1,4 @@
-from turtledemo.penrose import start
+
 
 
 class GameState():
@@ -468,7 +468,27 @@ class GameState():
                 self.whiteToMove = not self.whiteToMove
                 self.moves.append(move)
 
+        elif move.startRow == 3 and self.board[move.startRow][move.startCol] == "wP":
+            if move.endRow == 2 and (move.endCol == move.startCol + 1 or move.endCol == move.startCol - 1):
+                lastMove = self.moves.pop()
+                self.moves.append(lastMove)
+                if lastMove.pieceMoved == "bP" and lastMove.startRow == 1 and lastMove.endRow == 3 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+                    self.board[move.startRow][move.startCol] = "--"
+                    self.board[move.endRow][move.endCol] = move.pieceMoved
+                    self.board[move.endRow + 1][move.endCol] = "--"
+                    self.whiteToMove = not self.whiteToMove
+                    self.moves.append(move)
 
+        elif move.startRow == 4 and self.board[move.startRow][move.startCol] == "bP":
+            if move.endRow == 5 and (move.endCol == move.startCol + 1 or move.endCol == move.startCol - 1):
+                lastMove = self.moves.pop()
+                self.moves.append(lastMove)
+                if lastMove.pieceMoved == "wP" and lastMove.startRow == 6 and lastMove.endRow == 4 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+                    self.board[move.startRow][move.startCol] = "--"
+                    self.board[move.endRow][move.endCol] = move.pieceMoved
+                    self.board[move.endRow - 1][move.endCol] = "--"
+                    self.whiteToMove = not self.whiteToMove
+                    self.moves.append(move)
 
 
 class Move():
