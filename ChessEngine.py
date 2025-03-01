@@ -58,6 +58,11 @@ class GameState():
                             self.checkRockMove(i, j)
                         elif self.board[i][j][1] == "B":
                             self.checkBishopMove(i, j)
+                        elif self.board[i][j][1] == "Q":
+                            self.checkBishopMove(i, j)
+                            self.checkRockMove(i, j)
+                        elif self.board[i][j][1] == "K":
+                            self.checkKingMove(i, j)
 
             if len(self.checkKing) > 0:
                 self.undoMove()
@@ -495,6 +500,49 @@ class GameState():
             if move.startCol + 1 <= 7 and self.board[move.startRow][move.startCol + 1][0] != color:
                 legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + 1)
                 self.legalMoves.append(legalMove)
+
+    def checkKingMove(self, startRow, startCol):
+        if self.whiteToMove == True:
+            color = "w"
+            oppositeColor = "b"
+        else:
+            color = "b"
+            oppositeColor = "w"
+
+        if startRow - 1 >= 0:
+            if self.board[startRow - 1][startCol] == oppositeColor + "K":
+                checkMove = (startRow, startCol, startRow - 1, startCol)
+                self.checkKing.append(checkMove)
+            if startCol - 1 >= 0:
+                if self.board[startRow - 1][startCol - 1] == oppositeColor + "K":
+                    checkMove = (startRow, startCol, startRow - 1, startCol - 1)
+                    self.checkKing.append(checkMove)
+            if startCol + 1 <= 7:
+                if self.board[startRow - 1][startCol + 1] == oppositeColor + "K":
+                    checkMove = (startRow, startCol, startRow - 1, startCol + 1)
+                    self.checkKing.append(checkMove)
+
+        if startRow + 1 <= 7:
+            if self.board[startRow + 1][startCol] == oppositeColor + "K":
+                checkMove = (startRow, startCol, startRow + 1, startCol)
+                self.checkKing.append(checkMove)
+            if startCol - 1 >= 0:
+                if self.board[startRow + 1][startCol - 1] == oppositeColor + "K":
+                    checkMove = (startRow, startCol, startRow + 1, startCol - 1)
+                    self.checkKing.append(checkMove)
+            if startCol + 1 <= 7:
+                if self.board[startRow + 1][startCol + 1] == oppositeColor + "K":
+                    checkMove = (startRow, startCol, startRow + 1, startCol + 1)
+                    self.checkKing.append(checkMove)
+
+        if startCol - 1 >= 0 and self.board[startRow][startCol - 1] == oppositeColor + "K":
+            checkMove = (startRow, startCol, startRow, startCol - 1)
+            self.checkKing.append(checkMove)
+
+        if startCol + 1 <= 7 and self.board[startRow][startCol + 1] == oppositeColor + "K":
+            checkMove = (startRow, startCol, startRow, startCol + 1)
+            self.checkKing.append(checkMove)
+
 
     def specificMoves(self, move):
         if move.startRow == 7 and move.startCol == 4:
