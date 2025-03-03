@@ -1,3 +1,5 @@
+import pygame as p
+
 
 class GameState():
     def __init__(self):
@@ -43,43 +45,103 @@ class GameState():
             self.moves.append(move)
             self.whiteToMove = not self.whiteToMove
             self.checkKing = []
-            if self.whiteToMove == True:
-                color = "w"
-            else:
-                color = "b"
-            for i in range(8):
-                for j in range(8):
-                    if self.board[i][j][0] == color:
-                        if self.board[i][j][1] == "P":
-                            self.checkPawnMove(i, j)
-                        elif self.board[i][j][1] == "N":
-                            self.checkKnightMove(i, j)
-                        elif self.board[i][j][1] == "R":
-                            self.checkRockMove(i, j)
-                        elif self.board[i][j][1] == "B":
-                            self.checkBishopMove(i, j)
-                        elif self.board[i][j][1] == "Q":
-                            self.checkBishopMove(i, j)
-                            self.checkRockMove(i, j)
-                        elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j)
-
+            self.checkChecks()
             if len(self.checkKing) > 0:
                 self.undoMove()
+
         else:
             self.specificMoves(move)
 
         self.legalMoves = []
         self.checkKing = []
 
+    def checkChecks(self):
+        self.checkKing = []
+        if self.whiteToMove == True:
+            color = "w"
+        else:
+            color = "b"
+        for i in range(8):
+            for j in range(8):
+                if self.board[i][j][0] == color:
+                    if self.board[i][j][1] == "P":
+                        self.checkPawnMove(i, j)
+                    elif self.board[i][j][1] == "N":
+                        self.checkKnightMove(i, j)
+                    elif self.board[i][j][1] == "R":
+                        self.checkRockMove(i, j)
+                    elif self.board[i][j][1] == "B":
+                        self.checkBishopMove(i, j)
+                    elif self.board[i][j][1] == "Q":
+                        self.checkBishopMove(i, j)
+                        self.checkRockMove(i, j)
+                    elif self.board[i][j][1] == "K":
+                        self.checkKingMove(i, j)
 
     def undoMove(self):
         if len(self.moves) == 0:
             return
         move = self.moves.pop()
-        self.board[move.startRow][move.startCol] = move.pieceMoved
-        self.board[move.endRow][move.endCol] = move.pieceCaptured
-        self.whiteToMove = not self.whiteToMove
+        if len(self.moves) != 0:
+            lastMove = self.moves.pop()
+            self.moves.append(lastMove)
+
+        if move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.pieceMoved == "wK":
+            if move.endCol == 7:
+                self.board[move.startRow][move.startCol] = "wK"
+                self.board[move.endRow][move.endCol] = "wR"
+                self.board[7][5] = "--"
+                self.board[7][6] = "--"
+                self.whiteToMove = not self.whiteToMove
+            elif move.endCol == 0:
+                self.board[move.startRow][move.startCol] = "wK"
+                self.board[move.endRow][move.endCol] = "wR"
+                self.board[7][1] = "--"
+                self.board[7][2] = "--"
+                self.board[7][3] = "--"
+                self.whiteToMove = not self.whiteToMove
+        elif move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.pieceMoved == "bK":
+            if move.endCol == 7:
+                self.board[move.startRow][move.startCol] = "bK"
+                self.board[move.endRow][move.endCol] = "bR"
+                self.board[0][5] = "--"
+                self.board[0][6] = "--"
+                self.whiteToMove = not self.whiteToMove
+            elif move.endCol == 0:
+                self.board[move.startRow][move.startCol] = "bK"
+                self.board[move.endRow][move.endCol] = "bR"
+                self.board[0][1] = "--"
+                self.board[0][2] = "--"
+                self.board[0][3] = "--"
+                self.whiteToMove = not self.whiteToMove
+
+        elif move.startRow == 3 and move.pieceMoved == "wP" and lastMove.pieceMoved == "bP" and lastMove.startRow == 1 and lastMove.endRow == 3 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[move.endRow + 1][move.endCol] = "bP"
+            self.whiteToMove = not self.whiteToMove
+
+        elif move.startRow == 4 and move.pieceMoved == "bP" and lastMove.pieceMoved == "wP" and lastMove.startRow == 6 and lastMove.endRow == 4 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[move.endRow - 1][move.endCol] = "wP"
+            self.whiteToMove = not self.whiteToMove
+
+        elif self.whiteToMove and move.pieceMoved == "wP" and move.endRow == 0:
+            self.board[move.startRow][move.startCol] = "wP"
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove
+
+        elif not self.whiteToMove and move.pieceMoved == "bP" and move.endRow == 7:
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove
+
+
+        else:
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.whiteToMove = not self.whiteToMove
 
     def pawnMove(self, move):
         if self.whiteToMove == True:
@@ -87,7 +149,7 @@ class GameState():
                 legalMove = (move.startRow, move.startCol, move.startRow - 2, move.startCol)
                 self.legalMoves.append(legalMove)
 
-            if move.startRow >= 1:
+            if move.startRow >= 2:
                 if self.board[move.startRow - 1][move.startCol] == "--":
                     legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol)
                     self.legalMoves.append(legalMove)
@@ -105,7 +167,7 @@ class GameState():
                 legalMove = (move.startRow, move.startCol, move.startRow + 2, move.startCol)
                 self.legalMoves.append(legalMove)
 
-            if move.startRow <= 6:
+            if move.startRow <= 5:
                 if self.board[move.startRow + 1][move.startCol] == "--":
                     legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol)
                     self.legalMoves.append(legalMove)
@@ -543,6 +605,18 @@ class GameState():
             checkMove = (startRow, startCol, startRow, startCol + 1)
             self.checkKing.append(checkMove)
 
+    def get_promotion_choice(self):
+        while True:
+            for event in p.event.get():
+                if event.type == p.KEYDOWN:
+                    if event.key == p.K_q:
+                        return "Q"
+                    elif event.key == p.K_n:
+                        return "N"
+                    elif event.key == p.K_b:
+                        return "B"
+                    elif event.key == p.K_r:
+                        return "R"
 
     def specificMoves(self, move):
         if move.startRow == 7 and move.startCol == 4:
@@ -554,6 +628,15 @@ class GameState():
                 self.board[7][5] = "wR"
                 self.whiteToMove = not self.whiteToMove
                 self.moves.append(move)
+                self.checkChecks()
+                if len(self.checkKing) > 0:
+                    move = self.moves.pop()
+                    self.board[move.startRow][move.startCol] = move.pieceMoved
+                    self.board[move.endRow][move.endCol] = move.pieceCaptured
+                    self.board[7][6] = "--"
+                    self.board[7][5] = "--"
+                    self.whiteToMove = not self.whiteToMove
+
             elif move.endRow == 7 and move.endCol == 0 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[7][3] == "--" and self.board[7][2] == "--" and self.board[7][1] == "--":
                 self.board[move.startRow][move.startCol] = "--"
@@ -601,6 +684,21 @@ class GameState():
                     self.board[move.endRow - 1][move.endCol] = "--"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
+
+
+        elif self.whiteToMove and move.pieceMoved == "wP" and move.endRow == 0:
+            promotion_piece = "w" + self.get_promotion_choice()
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = promotion_piece
+            self.whiteToMove = not self.whiteToMove
+            self.moves.append(move)
+
+        elif not self.whiteToMove and move.pieceMoved == "bP" and move.endRow == 7:
+            promotion_piece = "b" + self.get_promotion_choice()
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = promotion_piece
+            self.whiteToMove = not self.whiteToMove
+            self.moves.append(move)
 
 
 
