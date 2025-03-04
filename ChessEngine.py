@@ -1,6 +1,5 @@
 import pygame as p
 
-
 class GameState():
     def __init__(self):
         self.board = [
@@ -50,7 +49,21 @@ class GameState():
                 self.undoMove()
 
         else:
-            self.specificMoves(move)
+            self.whiteToMove = not self.whiteToMove
+            self.checkKing = []
+            self.checkChecks()
+            self.whiteToMove = not self.whiteToMove
+            if len(self.checkKing) == 0:
+                self.castling(move)
+            elif len(self.checkKing) > 0:
+                self.elpassantAndPromotion(move)
+                self.whiteToMove = not self.whiteToMove
+                self.checkKing = []
+                self.checkChecks()
+                self.whiteToMove = not self.whiteToMove
+                if len(self.checkKing) > 0:
+                    self.undoMove()
+
 
         self.legalMoves = []
         self.checkKing = []
@@ -77,6 +90,7 @@ class GameState():
                         self.checkRockMove(i, j)
                     elif self.board[i][j][1] == "K":
                         self.checkKingMove(i, j)
+
 
     def undoMove(self):
         if len(self.moves) == 0:
@@ -618,7 +632,7 @@ class GameState():
                     elif event.key == p.K_r:
                         return "R"
 
-    def specificMoves(self, move):
+    def castling(self, move):
         if move.startRow == 7 and move.startCol == 4:
             if move.endRow == 7 and move.endCol == 7 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[7][5] == "--" and self.board[7][6] == "--":
@@ -663,8 +677,8 @@ class GameState():
                 self.whiteToMove = not self.whiteToMove
                 self.moves.append(move)
 
-        elif move.startRow == 3 and self.board[move.startRow][move.startCol] == "wP":
-            if move.endRow == 2 and (move.endCol == move.startCol + 1 or move.endCol == move.startCol - 1):
+    def elpassantAndPromotion(self, move):
+        if move.startRow == 3 and self.board[move.startRow][move.startCol] == "wP":
                 lastMove = self.moves.pop()
                 self.moves.append(lastMove)
                 if lastMove.pieceMoved == "bP" and lastMove.startRow == 1 and lastMove.endRow == 3 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
@@ -675,7 +689,6 @@ class GameState():
                     self.moves.append(move)
 
         elif move.startRow == 4 and self.board[move.startRow][move.startCol] == "bP":
-            if move.endRow == 5 and (move.endCol == move.startCol + 1 or move.endCol == move.startCol - 1):
                 lastMove = self.moves.pop()
                 self.moves.append(lastMove)
                 if lastMove.pieceMoved == "wP" and lastMove.startRow == 6 and lastMove.endRow == 4 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
