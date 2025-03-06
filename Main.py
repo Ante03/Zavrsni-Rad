@@ -24,8 +24,8 @@ def main():
 
             elif event.type == p.MOUSEBUTTONDOWN:
                 location = p.mouse.get_pos()
-                col = location[0]//SQ_SIZE
-                row = location[1]//SQ_SIZE
+                col = location[0] // SQ_SIZE
+                row = location[1] // SQ_SIZE
                 if sqSelected == (row, col):
                     sqSelected = ()
                     playerClicks = []
@@ -38,11 +38,13 @@ def main():
                     sqSelected = ()
                     playerClicks = []
 
+
             elif event.type == p.KEYDOWN:
                 if event.key == p.K_z:
                     gs.undoMove()
                     sqSelected = ()
                     playerClicks = []
+
 
 
 

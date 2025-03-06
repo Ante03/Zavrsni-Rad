@@ -25,8 +25,6 @@ class GameState():
             return
 
         self.legalMoves = []
-        self.checkKing = []
-
         if self.board[move.startRow][move.startCol][1] == "P":
             self.pawnMove(move)
         elif self.board[move.startRow][move.startCol][1] == "N":
@@ -46,7 +44,6 @@ class GameState():
             self.board[move.endRow][move.endCol] = move.pieceMoved
             self.moves.append(move)
             self.whiteToMove = not self.whiteToMove
-            self.checkKing = []
             self.checkChecks()
             if len(self.checkKing) > 0:
                 self.undoMove()
@@ -55,9 +52,7 @@ class GameState():
             self.castling(move)
             self.elpassantAndPromotion(move)
 
-
         self.legalMoves = []
-        self.checkKing = []
 
     def checkChecks(self):
         self.checkKing = []
@@ -78,7 +73,7 @@ class GameState():
                             self.checkBishopMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
                             self.checkRockMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
                         elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j)
+                            self.checkKingMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
         else:
             color = "b"
             for i in range(8):
@@ -96,12 +91,20 @@ class GameState():
                             self.checkBishopMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
                             self.checkRockMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
                         elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j)
+                            self.checkKingMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
 
     def undoMove(self):
         if len(self.moves) == 0:
             return
         move = self.moves.pop()
+        if move.pieceMoved == "wK":
+            self.whiteKingPosition[0] = move.startRow
+            self.whiteKingPosition[1] = move.startCol
+        if move.pieceMoved == "bK":
+            self.blackKingPosition[0] = move.startRow
+            self.blackKingPosition[1] = move.startCol
+            print("AAAA")
+
         if len(self.moves) != 0:
             lastMove = self.moves.pop()
             self.moves.append(lastMove)
@@ -546,8 +549,8 @@ class GameState():
 
             if move.moveId in self.legalMoves:
                 self.whiteKingPosition = [move.endRow, move.endCol]
+                print(self.whiteKingPosition[0], self.whiteKingPosition[1])
 
-            print(self.whiteKingPosition)
 
 
         elif self.whiteToMove == False:
@@ -556,86 +559,77 @@ class GameState():
                 if self.board[move.startRow - 1][move.startCol][0] != color:
                     legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol)
                     self.legalMoves.append(legalMove)
-                    self.blackKingPosition = [move.startRow - 1, move.startCol]
                 if move.startCol - 1 >= 0:
                     if self.board[move.startRow - 1][move.startCol - 1][0] != color:
                         legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol - 1)
                         self.legalMoves.append(legalMove)
-                        self.blackKingPosition = [move.startRow - 1, move.startCol - 1]
                 if move.startCol + 1 <= 7:
                     if self.board[move.startRow - 1][move.startCol + 1][0] != color:
                         legalMove = (move.startRow, move.startCol, move.startRow - 1, move.startCol + 1)
                         self.legalMoves.append(legalMove)
-                        self.blackKingPosition = [move.startRow - 1, move.startCol + 1]
 
             if move.startRow + 1 <= 7:
                 if self.board[move.startRow + 1][move.startCol][0] != color:
                     legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol)
                     self.legalMoves.append(legalMove)
-                    self.blackKingPosition = [move.startRow + 1, move.startCol]
                 if move.startCol - 1 >= 0:
                     if self.board[move.startRow + 1][move.startCol - 1][0] != color:
                         legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol - 1)
                         self.legalMoves.append(legalMove)
-                        self.blackKingPosition = [move.startRow + 1, move.startCol - 1]
                 if move.startCol + 1 <= 7:
                     if self.board[move.startRow + 1][move.startCol + 1][0] != color:
                         legalMove = (move.startRow, move.startCol, move.startRow + 1, move.startCol + 1)
                         self.legalMoves.append(legalMove)
-                        self.blackKingPosition = [move.startRow + 1, move.startCol + 1]
 
             if move.startCol - 1 >= 0 and self.board[move.startRow][move.startCol - 1][0] != color:
                 legalMove = (move.startRow, move.startCol, move.startRow, move.startCol - 1)
                 self.legalMoves.append(legalMove)
-                self.blackKingPosition = [move.startRow, move.startCol - 1]
 
             if move.startCol + 1 <= 7 and self.board[move.startRow][move.startCol + 1][0] != color:
                 legalMove = (move.startRow, move.startCol, move.startRow, move.startCol + 1)
                 self.legalMoves.append(legalMove)
-                self.blackKingPosition = [move.startRow, move.startCol + 1]
 
             if move.moveId in self.legalMoves:
                 self.blackKingPosition = [move.endRow, move.endCol]
+                print(self.blackKingPosition[0], self.blackKingPosition[1])
 
-    def checkKingMove(self, startRow, startCol):
+    def checkKingMove(self, startRow, startCol, row, col):
         if self.whiteToMove == True:
-            color = "w"
             oppositeColor = "b"
         else:
-            color = "b"
             oppositeColor = "w"
 
         if startRow - 1 >= 0:
-            if self.board[startRow - 1][startCol] == oppositeColor + "K":
+            if startRow - 1 == row and startCol == col:
                 checkMove = (startRow, startCol, startRow - 1, startCol)
                 self.checkKing.append(checkMove)
             if startCol - 1 >= 0:
-                if self.board[startRow - 1][startCol - 1] == oppositeColor + "K":
+                if startRow - 1 == row and startCol - 1 == col:
                     checkMove = (startRow, startCol, startRow - 1, startCol - 1)
                     self.checkKing.append(checkMove)
             if startCol + 1 <= 7:
-                if self.board[startRow - 1][startCol + 1] == oppositeColor + "K":
+                if startRow - 1 == row and startCol + 1 == col:
                     checkMove = (startRow, startCol, startRow - 1, startCol + 1)
                     self.checkKing.append(checkMove)
 
         if startRow + 1 <= 7:
-            if self.board[startRow + 1][startCol] == oppositeColor + "K":
+            if startRow + 1 == row and startCol == col:
                 checkMove = (startRow, startCol, startRow + 1, startCol)
                 self.checkKing.append(checkMove)
             if startCol - 1 >= 0:
-                if self.board[startRow + 1][startCol - 1] == oppositeColor + "K":
+                if startRow + 1 == row and startCol - 1 == col:
                     checkMove = (startRow, startCol, startRow + 1, startCol - 1)
                     self.checkKing.append(checkMove)
             if startCol + 1 <= 7:
-                if self.board[startRow + 1][startCol + 1] == oppositeColor + "K":
+                if startRow + 1 == row and startCol + 1 == col:
                     checkMove = (startRow, startCol, startRow + 1, startCol + 1)
                     self.checkKing.append(checkMove)
 
-        if startCol - 1 >= 0 and self.board[startRow][startCol - 1] == oppositeColor + "K":
+        if startCol - 1 >= 0 and startRow == row and startCol - 1 == col:
             checkMove = (startRow, startCol, startRow, startCol - 1)
             self.checkKing.append(checkMove)
 
-        if startCol + 1 <= 7 and self.board[startRow][startCol + 1] == oppositeColor + "K":
+        if startCol + 1 <= 7 and startRow == row and startCol + 1 == col:
             checkMove = (startRow, startCol, startRow, startCol + 1)
             self.checkKing.append(checkMove)
 
@@ -656,9 +650,7 @@ class GameState():
         if move.startRow == 7 and move.startCol == 4:
             if move.endRow == 7 and move.endCol == 7 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[7][5] == "--" and self.board[7][6] == "--":
-                self.checkKing = []
                 self.checkCastling(move)
-                print(len(self.checkKing))
                 if len(self.checkKing) == 0:
                     self.board[move.startRow][move.startCol] = "--"
                     self.board[move.endRow][move.endCol] = "--"
@@ -666,13 +658,12 @@ class GameState():
                     self.board[7][5] = "wR"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
-
+                    self.whiteKingPosition[0] = move.endRow
+                    self.whiteKingPosition[1] = move.endCol
 
             elif move.endRow == 7 and move.endCol == 0 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[7][3] == "--" and self.board[7][2] == "--" and self.board[7][1] == "--":
-                self.checkKing = []
                 self.checkCastling(move)
-                print(len(self.checkKing))
                 if len(self.checkKing) == 0:
                     self.board[move.startRow][move.startCol] = "--"
                     self.board[move.endRow][move.endCol] = "--"
@@ -680,13 +671,13 @@ class GameState():
                     self.board[7][3] = "wR"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
+                    self.whiteKingPosition[0] = move.endRow
+                    self.whiteKingPosition[1] = move.endCol
 
         elif move.startRow == 0 and move.startCol == 4:
             if move.endRow == 0 and move.endCol == 7 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[0][5] == "--" and self.board[0][6] == "--":
-                self.checkKing = []
                 self.checkCastling(move)
-                print(len(self.checkKing))
                 if len(self.checkKing) == 0:
                     self.board[move.startRow][move.startCol] = "--"
                     self.board[move.endRow][move.endCol] = "--"
@@ -694,12 +685,12 @@ class GameState():
                     self.board[0][5] = "bR"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
+                    self.blackKingPosition[0] = move.endRow
+                    self.blackKingPosition[1] = move.endCol
 
             elif move.endRow == 0 and move.endCol == 0 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
                     self.board[0][3] == "--" and self.board[0][2] == "--" and self.board[0][1] == "--":
-                self.checkKing = []
                 self.checkCastling(move)
-                print(len(self.checkKing))
                 if len(self.checkKing) == 0:
                     self.board[move.startRow][move.startCol] = "--"
                     self.board[move.endRow][move.endCol] = "--"
@@ -707,6 +698,8 @@ class GameState():
                     self.board[0][3] = "bR"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
+                    self.blackKingPosition[0] = move.endRow
+                    self.blackKingPosition[1] = move.endCol
 
     def checkCastling(self, move):
         self.checkKing = []
@@ -788,11 +781,10 @@ class GameState():
                                 self.checkBishopMove(i, j, 7, 2)
                                 self.checkBishopMove(i, j, 7, 3)
                         elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j)
+                            self.checkKingMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
             self.whiteToMove = not self.whiteToMove
-            #print(self.whiteToMove)
+
         else:
-            print(self.whiteToMove)
             self.whiteToMove = not self.whiteToMove
             color = "w"
             for i in range(8):
@@ -870,7 +862,7 @@ class GameState():
                                 self.checkBishopMove(i, j, 0, 2)
                                 self.checkBishopMove(i, j, 0, 3)
                         elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j)
+                            self.checkKingMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
             self.whiteToMove = not self.whiteToMove
 
     def elpassantAndPromotion(self, move):
@@ -883,7 +875,6 @@ class GameState():
                     self.board[move.startRow][move.startCol - 1] = "--"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
-                    self.checkKing = []
                     self.checkChecks()
                     if len(self.checkKing) > 0:
                         self.undoMove()
@@ -893,7 +884,6 @@ class GameState():
                     self.board[move.startRow][move.startCol + 1] = "--"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
-                    self.checkKing = []
                     self.checkChecks()
                     if len(self.checkKing) > 0:
                         self.undoMove()
@@ -907,7 +897,6 @@ class GameState():
                     self.board[move.startRow][move.startCol - 1] = "--"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
-                    self.checkKing = []
                     self.checkChecks()
                     if len(self.checkKing) > 0:
                         self.undoMove()
@@ -917,7 +906,6 @@ class GameState():
                     self.board[move.startRow][move.startCol + 1] = "--"
                     self.whiteToMove = not self.whiteToMove
                     self.moves.append(move)
-                    self.checkKing = []
                     self.checkChecks()
                     if len(self.checkKing) > 0:
                         self.undoMove()
@@ -929,7 +917,6 @@ class GameState():
             self.board[move.endRow][move.endCol] = promotion_piece
             self.whiteToMove = not self.whiteToMove
             self.moves.append(move)
-            self.checkKing = []
             self.checkChecks()
             if len(self.checkKing) > 0:
                 self.undoMove()
@@ -940,7 +927,6 @@ class GameState():
             self.board[move.endRow][move.endCol] = promotion_piece
             self.whiteToMove = not self.whiteToMove
             self.moves.append(move)
-            self.checkKing = []
             self.checkChecks()
             if len(self.checkKing) > 0:
                 self.undoMove()
