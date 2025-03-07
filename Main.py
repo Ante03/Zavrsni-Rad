@@ -1,51 +1,61 @@
 
 import pygame as p
-import ChessEngine
+import ChessEngine, smartMove
 
 WIDTH = HEIGHT = 400
 DIMENSION = 8
 SQ_SIZE = HEIGHT // DIMENSION
 IMAGES = {}
 MAX_FPS = 15
-
+playerOne = True
+playerTwo = False
 def main():
+    gs = ChessEngine.GameState()
     p.init()
     screen = p.display.set_mode((WIDTH, HEIGHT))
     p.display.set_caption("Ante Chess")
-    gs = ChessEngine.GameState()
     loadImages()
     sqSelected = ()
     playerClicks = []
     running = True
     while running:
+        humenTurn = gs.whiteToMove
         for event in p.event.get():
             if event.type == p.QUIT:
                 running = False
 
             elif event.type == p.MOUSEBUTTONDOWN:
-                location = p.mouse.get_pos()
-                col = location[0] // SQ_SIZE
-                row = location[1] // SQ_SIZE
-                if sqSelected == (row, col):
-                    sqSelected = ()
-                    playerClicks = []
-                else:
-                    sqSelected = (row, col)
-                    playerClicks.append(sqSelected)
-                if len(playerClicks) == 2:
-                    move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                    gs.makeMove(move)
-                    sqSelected = ()
-                    playerClicks = []
+                if humenTurn:
+                    location = p.mouse.get_pos()
+                    col = location[0] // SQ_SIZE
+                    row = location[1] // SQ_SIZE
+                    if sqSelected == (row, col):
+                        sqSelected = ()
+                        playerClicks = []
+                    else:
+                        sqSelected = (row, col)
+                        playerClicks.append(sqSelected)
+                    if len(playerClicks) == 2:
+                        move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
+                        gs.makeMove(move)
+                        sqSelected = ()
+                        playerClicks = []
 
+            elif not humenTurn:
+                gs.getLegalMoves()
+                validMoves = gs.legalMoves
+                aiMove = validMoves[smartMove.findMove(validMoves)]
+                a = [aiMove[0], aiMove[1]]
+                b = [aiMove[2], aiMove[3]]
+                print(aiMove)
+                move = ChessEngine.Move(a, b, gs.board)
+                gs.makeMove(move)
 
             elif event.type == p.KEYDOWN:
                 if event.key == p.K_z:
                     gs.undoMove()
                     sqSelected = ()
                     playerClicks = []
-
-
 
 
         drawGameState(screen, gs)
