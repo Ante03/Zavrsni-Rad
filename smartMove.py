@@ -1,5 +1,4 @@
 import random
-import ChessEngine
 import time
 
 pieceScore = {"K" : 0, "Q" : 10, "R" : 5, "B" : 3, "N" : 3, "P" : 1}

@@ -1,6 +1,5 @@
 
 import pygame as p
-import pygame.time
 
 import ChessEngine, smartMove
 import time

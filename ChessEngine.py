@@ -1,4 +1,4 @@
-import pygame as p
+
 
 class GameState():
     def __init__(self):
