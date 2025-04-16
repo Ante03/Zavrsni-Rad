@@ -1,6 +1,9 @@
 
 import pygame as p
+import pygame.time
+
 import ChessEngine, smartMove
+import time
 
 WIDTH = HEIGHT = 400
 DIMENSION = 8
@@ -37,19 +40,21 @@ def main():
                         playerClicks.append(sqSelected)
                     if len(playerClicks) == 2:
                         move = ChessEngine.Move(playerClicks[0], playerClicks[1], gs.board)
-                        gs.makeMove(move)
+                        gs.getLegalMoves()
+                        gs.getValidMoves()
+                        if move in gs.validMoves:
+                            print(move.moveId)
+                            gs.makeMove(move)
+                            #print(f"Pomaknuta figura: {move.pieceMoved}, start: {move.startRow},{move.startCol}, end: {move.endRow},{move.endCol}")
+                        elif len(gs.validMoves) == 0:
+                            print("Sah mat")
+                            time.sleep(10)
+                            return
+                        else:
+                            gs.makeSpecificMove(move)
+
                         sqSelected = ()
                         playerClicks = []
-
-            elif not humenTurn:
-                gs.getLegalMoves()
-                validMoves = gs.legalMoves
-                aiMove = validMoves[smartMove.findMove(validMoves)]
-                a = [aiMove[0], aiMove[1]]
-                b = [aiMove[2], aiMove[3]]
-                print(aiMove)
-                move = ChessEngine.Move(a, b, gs.board)
-                gs.makeMove(move)
 
             elif event.type == p.KEYDOWN:
                 if event.key == p.K_z:
@@ -57,7 +62,20 @@ def main():
                     sqSelected = ()
                     playerClicks = []
 
+            elif not humenTurn and not gs.gameOver:
+                gs.getLegalMoves()
+                gs.getValidMoves()
+                #print(gs.validMoves)
 
+
+                if len(gs.validMoves) == 0:
+                    time.sleep(5)
+                    print("SahMat")
+                    return
+                else:
+                    aiMove = smartMove.findBestMove(gs, gs.validMoves)
+                    print(aiMove.startRow, aiMove.startCol, aiMove.endRow, aiMove.endCol)
+                    gs.makeMove(aiMove)
         drawGameState(screen, gs)
         p.display.flip()
 

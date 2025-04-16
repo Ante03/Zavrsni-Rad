@@ -15,60 +15,143 @@ class GameState():
         self.whiteToMove = True
         self.moves = []
         self.legalMoves = []
+        self.validMoves = []
+        self.specificMoves = []
         self.checkKing = []
         self.whiteKingPosition = [7, 4]
         self.blackKingPosition = [0, 4]
-
+        self.gameOver = False
 
     def makeMove(self, move):
         if (self.whiteToMove and self.board[move.startRow][move.startCol][0] != "w") or (not self.whiteToMove and self.board[move.startRow][move.startCol][0] != "b"):
             return
 
-        self.getLegalMoves()
-
-        if move.moveId in self.legalMoves:
-
+        if(move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 7 and self.board[move.startRow][move.startCol] == "wK"):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[7][5] = "wR"
+            self.board[7][6] = "wK"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 6
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 0 and self.board[move.startRow][move.startCol] == "wK"):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[7][3] = "wR"
+            self.board[7][2] = "wK"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 2
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 0 and self.board[move.startRow][move.startCol] == "bK"):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[0][3] = "bR"
+            self.board[0][2] = "bK"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 6
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 7 and self.board[move.startRow][move.startCol] == "bK"):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[0][5] = "bR"
+            self.board[0][6] = "bK"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 2
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        else:
             self.board[move.startRow][move.startCol] = "--"
             self.board[move.endRow][move.endCol] = move.pieceMoved
             self.moves.append(move)
             self.whiteToMove = not self.whiteToMove
-            self.checkChecks()
-            if move.pieceMoved == "wK":
-                self.whiteKingPosition[0] = move.endRow
-                self.whiteKingPosition[1] = move.endCol
-            elif move.pieceMoved == "bK":
-                self.blackKingPosition[0] = move.endRow
-                self.blackKingPosition[1] = move.endCol
-            if len(self.checkKing) > 0:
-                self.undoMove()
+        if move.pieceMoved == "wK":
+            self.whiteKingPosition[0] = move.endRow
+            self.whiteKingPosition[1] = move.endCol
+        elif move.pieceMoved == "bK":
+            self.blackKingPosition[0] = move.endRow
+            self.blackKingPosition[1] = move.endCol
 
+    def makeSpecificMove(self, move):
+        if (self.whiteToMove and self.board[move.startRow][move.startCol][0] != "w") or (not self.whiteToMove and self.board[move.startRow][move.startCol][0] != "b"):
+            return
 
-        else:
-            self.castling(move)
-            self.elpassantAndPromotion(move)
+        if(move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 7):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[7][5] = "wR"
+            self.board[7][6] = "wK"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 6
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 0):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[7][3] = "wR"
+            self.board[7][2] = "wK"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 2
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 0):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[0][3] = "bR"
+            self.board[0][2] = "bK"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 6
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 7):
+            self.board[move.startRow][move.startCol] = "--"
+            self.board[move.endRow][move.endCol] = "--"
+            self.board[0][5] = "bR"
+            self.board[0][6] = "bK"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 2
+            self.moves.append(move)
+            self.whiteToMove = not self.whiteToMove
 
     def getLegalMoves(self):
         self.legalMoves = []
-        if self.whiteToMove == True:
-            color = "w"
-        else:
-            color = "b"
+        self.specificMoves = []
+        color = "w" if self.whiteToMove else "b"
+
         for i in range(8):
             for j in range(8):
-                if self.board[i][j][0] == color:
-                    if self.board[i][j][1] == "P":
-                        self.pawnMove(i, j)
-                    elif self.board[i][j][1] == "N":
-                        self.knightMove(i, j)
-                    elif self.board[i][j][1] == "R":
-                        self.rockMove(i, j)
-                    elif self.board[i][j][1] == "B":
-                        self.bishopMove(i, j)
-                    elif self.board[i][j][1] == "Q":
-                        self.bishopMove(i, j)
-                        self.rockMove(i, j)
-                    elif self.board[i][j][1] == "K":
-                        self.kingMove(i, j)
+                piece = self.board[i][j]
+                if piece == "--" or piece[0] != color:
+                    continue
+
+                pieceType = piece[1]
+                if pieceType == "P":
+                    self.pawnMove(i, j)
+                elif pieceType == "N":
+                    self.knightMove(i, j)
+                elif pieceType == "R":
+                    self.rockMove(i, j)
+                elif pieceType == "B":
+                    self.bishopMove(i, j)
+                elif pieceType == "Q":
+                    self.bishopMove(i, j)
+                    self.rockMove(i, j)
+                elif pieceType == "K":
+                    self.kingMove(i, j)
+                    self.castling(i, j)
+
+    def getValidMoves(self):
+        moves = self.legalMoves.copy() + self.specificMoves.copy()
+        self.validMoves = []
+        for move in moves:
+            mv = Move([move[0], move[1]], [move[2], move[3]], self.board)
+            self.makeMove(mv)
+            self.checkChecks()
+            if len(self.checkKing) == 0:
+                self.validMoves.append(mv)
+            self.undoMove()
 
     def checkChecks(self):
         self.checkKing = []
@@ -78,7 +161,7 @@ class GameState():
                 for j in range(8):
                     if self.board[i][j][0] == color:
                         if self.board[i][j][1] == "P":
-                            self.checkPawnMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
+                            self.checkPawnMove(i, j)
                         elif self.board[i][j][1] == "N":
                             self.checkKnightMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
                         elif self.board[i][j][1] == "R":
@@ -96,7 +179,7 @@ class GameState():
                 for j in range(8):
                     if self.board[i][j][0] == color:
                         if self.board[i][j][1] == "P":
-                            self.checkPawnMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
+                            self.checkPawnMove(i, j)
                         elif self.board[i][j][1] == "N":
                             self.checkKnightMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
                         elif self.board[i][j][1] == "R":
@@ -109,761 +192,234 @@ class GameState():
                         elif self.board[i][j][1] == "K":
                             self.checkKingMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
 
+    def isCheckmate(self):
+        self.getLegalMoves()
+        if len(self.legalMoves) == 0:
+            if self.isKingInCheck():
+                print("Šah-mat!")
+                self.gameOver = True
+                return True
+            else:
+                print("Pat! Neriješeno.")
+                self.gameOver = True
+                return False
+        return False
+
     def undoMove(self):
         if len(self.moves) == 0:
             return
         move = self.moves.pop()
 
-
-        if len(self.moves) != 0:
-            lastMove = self.moves.pop()
-            self.moves.append(lastMove)
-
-        if move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.pieceMoved == "wK":
-            if move.endCol == 7:
-                self.board[move.startRow][move.startCol] = "wK"
-                self.board[move.endRow][move.endCol] = "wR"
-                self.board[7][5] = "--"
-                self.board[7][6] = "--"
-                self.whiteToMove = not self.whiteToMove
-                self.whiteKingPosition[0] = move.startRow
-                self.whiteKingPosition[1] = move.startCol
-            elif move.endCol == 0:
-                self.board[move.startRow][move.startCol] = "wK"
-                self.board[move.endRow][move.endCol] = "wR"
-                self.board[7][1] = "--"
-                self.board[7][2] = "--"
-                self.board[7][3] = "--"
-                self.whiteKingPosition[0] = move.startRow
-                self.whiteKingPosition[1] = move.startCol
-        elif move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.pieceMoved == "bK":
-            if move.endCol == 7:
-                self.board[move.startRow][move.startCol] = "bK"
-                self.board[move.endRow][move.endCol] = "bR"
-                self.board[0][5] = "--"
-                self.board[0][6] = "--"
-                self.whiteToMove = not self.whiteToMove
-                self.blackKingPosition[0] = move.startRow
-                self.blackKingPosition[1] = move.startCol
-            elif move.endCol == 0:
-                self.board[move.startRow][move.startCol] = "bK"
-                self.board[move.endRow][move.endCol] = "bR"
-                self.board[0][1] = "--"
-                self.board[0][2] = "--"
-                self.board[0][3] = "--"
-                self.whiteToMove = not self.whiteToMove
-                self.blackKingPosition[0] = move.startRow
-                self.blackKingPosition[1] = move.startCol
-
-        elif move.startRow == 3 and move.pieceMoved == "wP" and lastMove.pieceMoved == "bP" and lastMove.startRow == 1 and lastMove.endRow == 3 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+        if(move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 7 and move.pieceMoved == "wK"):
             self.board[move.startRow][move.startCol] = move.pieceMoved
-            self.board[move.endRow][move.endCol] = "--"
-            self.board[move.endRow + 1][move.endCol] = "bP"
+            self.board[move.endRow][move.endCol] = "wR"
+            self.board[7][5] = "--"
+            self.board[7][6] = "--"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 4
             self.whiteToMove = not self.whiteToMove
-
-        elif move.startRow == 4 and move.pieceMoved == "bP" and lastMove.pieceMoved == "wP" and lastMove.startRow == 6 and lastMove.endRow == 4 and (lastMove.startCol == move.startCol - 1 or lastMove.startCol == move.startCol + 1):
+        elif (move.startRow == 7 and move.startCol == 4 and move.endRow == 7 and move.endCol == 0 and move.pieceMoved == "wK"):
             self.board[move.startRow][move.startCol] = move.pieceMoved
-            self.board[move.endRow][move.endCol] = "--"
-            self.board[move.endRow - 1][move.endCol] = "wP"
+            self.board[move.endRow][move.endCol] = "wR"
+            self.board[7][1] = "--"
+            self.board[7][2] = "--"
+            self.board[7][3] = "--"
+            self.whiteKingPosition[0] = 7
+            self.whiteKingPosition[1] = 4
             self.whiteToMove = not self.whiteToMove
-
-        elif self.whiteToMove and move.pieceMoved == "wP" and move.endRow == 0:
-            self.board[move.startRow][move.startCol] = "wP"
-            self.board[move.endRow][move.endCol] = move.pieceCaptured
-            self.whiteToMove = not self.whiteToMove
-
-        elif not self.whiteToMove and move.pieceMoved == "bP" and move.endRow == 7:
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 7 and move.pieceMoved == "bK"):
             self.board[move.startRow][move.startCol] = move.pieceMoved
-            self.board[move.endRow][move.endCol] = move.pieceCaptured
+            self.board[move.endRow][move.endCol] = "bR"
+            self.board[0][5] = "--"
+            self.board[0][6] = "--"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 4
             self.whiteToMove = not self.whiteToMove
-
-
+        elif (move.startRow == 0 and move.startCol == 4 and move.endRow == 0 and move.endCol == 0 and move.pieceMoved == "bK"):
+            self.board[move.startRow][move.startCol] = move.pieceMoved
+            self.board[move.endRow][move.endCol] = "bR"
+            self.board[0][1] = "--"
+            self.board[0][2] = "--"
+            self.board[0][3] = "--"
+            self.blackKingPosition[0] = 0
+            self.blackKingPosition[1] = 4
+            self.whiteToMove = not self.whiteToMove
         else:
             self.board[move.startRow][move.startCol] = move.pieceMoved
             self.board[move.endRow][move.endCol] = move.pieceCaptured
             self.whiteToMove = not self.whiteToMove
-            if move.pieceMoved == "wK":
-                self.whiteKingPosition[0] = move.startRow
-                self.whiteKingPosition[1] = move.startCol
-            if move.pieceMoved == "bK":
-                self.blackKingPosition[0] = move.startRow
-                self.blackKingPosition[1] = move.startCol
+
+    def isKingInCheck(self):
+        self.checkChecks()
+        return len(self.checkKing) > 0
 
     def pawnMove(self, startRow, startCol):
-        if self.whiteToMove:
-            if startRow == 6 and self.board[startRow - 1][startCol] == "--" and self.board[startRow - 2][
-                startCol] == "--":
-                self.legalMoves.append((startRow, startCol, startRow - 2, startCol))
+        direction = -1 if self.whiteToMove else 1
+        enemyColor = "b" if self.whiteToMove else "w"
 
-            if startRow > 0 and self.board[startRow - 1][startCol] == "--":
-                self.legalMoves.append((startRow, startCol, startRow - 1, startCol))
+        if self.board[startRow + direction][startCol] == "--":
+            self.legalMoves.append((startRow, startCol, startRow + direction, startCol))
 
-            if startRow > 0 and startCol > 0 and self.board[startRow - 1][startCol - 1][0] == "b":
-                self.legalMoves.append((startRow, startCol, startRow - 1, startCol - 1))
+            if (self.whiteToMove and startRow == 6) or (not self.whiteToMove and startRow == 1):
+                if self.board[startRow + 2 * direction][startCol] == "--":
+                    self.legalMoves.append((startRow, startCol, startRow + 2 * direction, startCol))
 
-            if startRow > 0 and startCol < 7 and self.board[startRow - 1][startCol + 1][0] == "b":
-                self.legalMoves.append((startRow, startCol, startRow - 1, startCol + 1))
+        for side in [-1, 1]:
+            newCol = startCol + side
+            if 0 <= newCol < 8 and self.board[startRow + direction][newCol][0] == enemyColor:
+                self.legalMoves.append((startRow, startCol, startRow + direction, newCol))
 
-        else:
-            if startRow == 1 and self.board[startRow + 1][startCol] == "--" and self.board[startRow + 2][
-                startCol] == "--":
-                self.legalMoves.append((startRow, startCol, startRow + 2, startCol))
+    def checkPawnMove(self, startRow, startCol):
+        direction = -1 if self.whiteToMove else 1
+        enemyKing = "bK" if self.whiteToMove else "wK"
 
-            if startRow < 7 and self.board[startRow + 1][startCol] == "--":
-                self.legalMoves.append((startRow, startCol, startRow + 1, startCol))
-
-            if startRow < 7 and startCol > 0 and self.board[startRow + 1][startCol - 1][0] == "w":
-                self.legalMoves.append((startRow, startCol, startRow + 1, startCol - 1))
-
-            if startRow < 7 and startCol < 7 and self.board[startRow + 1][startCol + 1][0] == "w":
-                self.legalMoves.append((startRow, startCol, startRow + 1, startCol + 1))
-
-    def checkPawnMove(self, startRow, startCol, row, col):
-        if self.whiteToMove == True:
-            if startRow >= 1:
-                if startCol > 0 and startRow - 1 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol - 1)
-                    self.checkKing.append(checkMove)
-
-
-                if startCol < 7 and startRow - 1 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol + 1)
-                    self.checkKing.append(checkMove)
-        else:
-            if startRow <= 6:
-                if startCol > 0 and startRow + 1 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol - 1)
-                    self.checkKing.append(checkMove)
-
-                if startCol < 7 and startRow + 1 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol + 1)
-                    self.checkKing.append(checkMove)
+        for side in [-1, 1]:
+            newRow, newCol = startRow + direction, startCol + side
+            if 0 <= newRow < 8 and 0 <= newCol < 8 and self.board[newRow][newCol] == enemyKing:
+                self.checkKing.append((startRow, startCol, newRow, newCol))
 
     def knightMove(self, startRow, startCol):
-        if self.whiteToMove:
-            color = "w"
-        else:
-            color = "b"
-
-        knightMoves = [
-            (-2, -1), (-2, 1), (2, -1), (2, 1),
-            (-1, -2), (-1, 2), (1, -2), (1, 2)
-        ]
+        color = "w" if self.whiteToMove else "b"
+        knightMoves = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]
 
         for dr, dc in knightMoves:
-            newRow = startRow + dr
-            newCol = startCol + dc
-            if 0 <= newRow <= 7 and 0 <= newCol <= 7:
+            newRow, newCol = startRow + dr, startCol + dc
+            if 0 <= newRow < 8 and 0 <= newCol < 8 and self.board[newRow][newCol][0] != color:
+                self.legalMoves.append((startRow, startCol, newRow, newCol))
+
+    def checkKnightMove(self, startRow, startCol, row, col):
+        oppositeColor = "b" if self.whiteToMove else "w"
+        knightMoves = [(-2, -1), (-2, 1), (2, -1), (2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2)]
+
+        for dr, dc in knightMoves:
+            newRow, newCol = startRow + dr, startCol + dc
+            if 0 <= newRow < 8 and 0 <= newCol < 8:
+                if self.board[newRow][newCol] == oppositeColor + "K":
+                    self.checkKing.append((startRow, startCol, newRow, newCol))
+
+    def rockMove(self, startRow, startCol):
+        oppositeColor = "b" if self.whiteToMove else "w"
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+        for dr, dc in directions:
+            for i in range(1, 8):
+                newRow, newCol = startRow + dr * i, startCol + dc * i
+                if 0 <= newRow < 8 and 0 <= newCol < 8:
+                    piece = self.board[newRow][newCol]
+                    if piece == "--":
+                        self.legalMoves.append((startRow, startCol, newRow, newCol))
+                    elif piece[0] == oppositeColor:
+                        self.legalMoves.append((startRow, startCol, newRow, newCol))
+                        break
+                    else:
+                        break
+                else:
+                    break
+
+    def checkRockMove(self, startRow, startCol, row, col):
+        oppositeColor = "b" if self.whiteToMove else "w"
+        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+
+        for dr, dc in directions:
+            for i in range(1, 8):
+                newRow, newCol = startRow + dr * i, startCol + dc * i
+                if 0 <= newRow < 8 and 0 <= newCol < 8:
+                    piece = self.board[newRow][newCol]
+                    if piece == oppositeColor + "K":
+                        self.checkKing.append((startRow, startCol, newRow, newCol))
+                        break
+                    elif piece[0] == oppositeColor or piece[0] == self.board[startRow][startCol][0]:
+                        break
+                else:
+                    break
+
+    def bishopMove(self, startRow, startCol):
+        oppositeColor = "b" if self.whiteToMove else "w"
+        directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]
+
+        for dr, dc in directions:
+            for i in range(1, 8):
+                newRow, newCol = startRow + dr * i, startCol + dc * i
+                if 0 <= newRow < 8 and 0 <= newCol < 8:
+                    piece = self.board[newRow][newCol]
+                    if piece == "--":
+                        self.legalMoves.append((startRow, startCol, newRow, newCol))
+                    elif piece[0] == oppositeColor:
+                        self.legalMoves.append((startRow, startCol, newRow, newCol))
+                        break
+                    else:
+                        break
+                else:
+                    break
+
+    def checkBishopMove(self, startRow, startCol, row, col):
+        oppositeColor = "b" if self.whiteToMove else "w"
+        directions = [(1, 1), (-1, 1), (1, -1), (-1, -1)]
+
+        for dr, dc in directions:
+            for i in range(1, 8):
+                newRow, newCol = startRow + dr * i, startCol + dc * i
+                if 0 <= newRow < 8 and 0 <= newCol < 8:
+                    piece = self.board[newRow][newCol]
+                    if piece == oppositeColor + "K":
+                        self.checkKing.append((startRow, startCol, newRow, newCol))
+                        break
+                    elif piece[0] == oppositeColor or piece[0] == self.board[startRow][startCol][0]:
+                        break
+                else:
+                    break
+
+    def kingMove(self, startRow, startCol):
+        color = "w" if self.whiteToMove else "b"
+        directions = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
+
+        for dr, dc in directions:
+            newRow, newCol = startRow + dr, startCol + dc
+            if 0 <= newRow < 8 and 0 <= newCol < 8:
                 if self.board[newRow][newCol][0] != color:
                     self.legalMoves.append((startRow, startCol, newRow, newCol))
 
-    def checkKnightMove(self, startRow, startCol, row, col):
-        if self.whiteToMove == True:
-            color = "w"
-        else:
-            color = "b"
-        if startRow > 1:
-            if startCol - 1 >= 0 and self.board[startRow - 2][startCol - 1][0] != color:
-                if startRow - 2 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow - 2, startCol - 1)
-                    self.checkKing.append(checkMove)
-            if startCol + 1 <= 7 and self.board[startRow - 2][startCol + 1][0] != color:
-                if startRow - 2 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow - 2, startCol + 1)
-                    self.checkKing.append(checkMove)
-        if startRow < 6:
-            if startCol - 1 >= 0 and self.board[startRow + 2][startCol - 1][0] != color:
-                if startRow + 2 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow + 2, startCol - 1)
-                    self.checkKing.append(checkMove)
-            if startCol + 1 <= 7 and self.board[startRow + 2][startCol + 1][0] != color:
-                if startRow + 2 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow + 2, startCol + 1)
-                    self.checkKing.append(checkMove)
-        if startRow > 0:
-            if startCol - 2 >= 0 and self.board[startRow - 1][startCol - 2][0] != color:
-                if startRow - 1 == row and startCol - 2 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol - 2)
-                    self.checkKing.append(checkMove)
-            if startCol + 2 <= 7 and self.board[startRow - 1][startCol + 2][0] != color:
-                if startRow - 1 == row and startCol + 2 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol + 2)
-                    self.checkKing.append(checkMove)
-        if startRow < 7:
-            if startCol - 2 >= 0 and self.board[startRow + 1][startCol - 2][0] != color:
-                if startRow + 1 == row and startCol - 2 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol - 2)
-                    self.checkKing.append(checkMove)
-            if startCol + 2 <= 7 and self.board[startRow + 1][startCol + 2][0] != color:
-                if startRow + 1 == row and startCol + 2 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol + 2)
-                    self.checkKing.append(checkMove)
-
-    def rockMove(self, startRow, startCol):
-        if self.whiteToMove == True:
-            color = "w"
-            oppositeColor = "b"
-        else:
-            color = "b"
-            oppositeColor = "w"
-
-        for i in range(1, 8 - startRow):
-            if self.board[startRow + i][startCol] == "--":
-                legalMove = (startRow, startCol, startRow + i, startCol)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow + i][startCol][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow + i, startCol)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow + i][startCol][0] == color:
-                break
-
-        for i in range(1, startRow + 1):
-            if self.board[startRow - i][startCol] == "--":
-                legalMove = (startRow, startCol, startRow - i, startCol)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow - i][startCol][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow - i, startCol)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow - i][startCol][0] == color:
-                break
-
-        for i in range(1, 8 - startCol):
-            if self.board[startRow][startCol + i] == "--":
-                legalMove = (startRow, startCol, startRow, startCol + i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow][startCol + i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow, startCol + i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow][startCol + i][0] == color:
-                break
-
-        for i in range(1, startCol + 1):
-            if self.board[startRow][startCol - i] == "--":
-                legalMove = (startRow, startCol, startRow, startCol - i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow][startCol - i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow, startCol - i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow][startCol - i][0] == color:
-                break
-
-    def checkRockMove(self, startRow, startCol, row, col):
-        if self.whiteToMove == True:
-            color = "w"
-            oppositeColor = "b"
-        else:
-            color = "b"
-            oppositeColor = "w"
-
-        for i in range(1, 8 - startRow):
-            if startRow + i == row and startCol == col:
-                checkMove = (startRow, startCol, startRow + i, startCol)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow + i][startCol][0] == oppositeColor:
-                break
-            elif self.board[startRow + i][startCol][0] == color:
-                break
-
-        for i in range(1, startRow + 1):
-            if startRow - i == row and startCol == col:
-                checkMove = (startRow, startCol, startRow - i, startCol)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow - i][startCol][0] == oppositeColor:
-                break
-            elif self.board[startRow - i][startCol][0] == color:
-                break
-
-        for i in range(1, 8 - startCol):
-            if startRow == row and startCol + i == col:
-                checkMove = (startRow, startCol, startRow, startCol + i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow][startCol + i][0] == oppositeColor:
-                break
-            elif self.board[startRow][startCol + i][0] == color:
-                break
-
-        for i in range(1, startCol + 1):
-            if startRow == row and startCol - i == col:
-                checkMove = (startRow, startCol, startRow, startCol - i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow][startCol - i][0] == oppositeColor:
-                break
-            elif self.board[startRow][startCol - i][0] == color:
-                break
-
-    def bishopMove(self, startRow, startCol):
-        if self.whiteToMove == True:
-            color = "w"
-            oppositeColor = "b"
-        else:
-            color = "b"
-            oppositeColor = "w"
-
-        for i in range(1, 8):
-            if startCol + i > 7 or startRow + i > 7:
-                break
-            elif self.board[startRow + i][startCol + i] == "--":
-                legalMove = (startRow, startCol, startRow + i, startCol + i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow + i][startCol + i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow + i, startCol + i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow + i][startCol + i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startCol - i < 0 or startRow + i > 7:
-                break
-            elif self.board[startRow + i][startCol - i] == "--":
-                legalMove = (startRow, startCol, startRow + i, startCol - i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow + i][startCol - i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow + i, startCol - i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow + i][startCol - i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startCol + i > 7 or startRow - i < 0:
-                break
-            elif self.board[startRow - i][startCol + i] == "--":
-                legalMove = (startRow, startCol, startRow - i, startCol + i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow - i][startCol + i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow - i, startCol + i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow - i][startCol + i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startCol - i < 0 or startRow - i < 0:
-                break
-            elif self.board[startRow - i][startCol - i] == "--":
-                legalMove = (startRow, startCol, startRow - i, startCol - i)
-                self.legalMoves.append(legalMove)
-            elif self.board[startRow - i][startCol - i][0] == oppositeColor:
-                legalMove = (startRow, startCol, startRow - i, startCol - i)
-                self.legalMoves.append(legalMove)
-                break
-            elif self.board[startRow - i][startCol - i][0] == color:
-                break
-
-    def checkBishopMove(self, startRow, startCol, row, col):
-        if self.whiteToMove == True:
-            color = "w"
-            oppositeColor = "b"
-        else:
-            color = "b"
-            oppositeColor = "w"
-
-        for i in range(1, 8):
-            if startRow + i > 7 or startCol + i > 7:
-                break
-            elif startRow + i == row and startCol + i == col:
-                checkMove = (startRow, startCol, startRow + i, startCol + i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow + i][startCol + i][0] == oppositeColor:
-                break
-            elif self.board[startRow + i][startCol + i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startRow + i > 7 or startCol - i < 0:
-                break
-            elif startRow + i == row and startCol - i == col:
-                checkMove = (startRow, startCol, startRow + i, startCol - i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow + i][startCol - i][0] == oppositeColor:
-                break
-            elif self.board[startRow + i][startCol - i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startRow - i < 0 or startCol + i > 7:
-                break
-            elif startRow - i == row and startCol + i == col:
-                checkMove = (startRow, startCol, startRow - i, startCol + i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow - i][startCol + i][0] == oppositeColor:
-                break
-            elif self.board[startRow - i][startCol + i][0] == color:
-                break
-
-        for i in range(1, 8):
-            if startRow - i < 0 or startCol - i < 0:
-                break
-            elif startRow - i == row and startCol - i == col:
-                checkMove = (startRow, startCol, startRow - i, startCol - i)
-                self.checkKing.append(checkMove)
-                break
-            elif self.board[startRow - i][startCol - i][0] == oppositeColor:
-                break
-            elif self.board[startRow - i][startCol - i][0] == color:
-                break
-
-    def kingMove(self, startRow, startCol):
-        if self.whiteToMove == True:
-            color = "w"
-            if startRow - 1 >= 0:
-                if self.board[startRow - 1][startCol][0] != color:
-                    legalMove = (startRow, startCol, startRow - 1, startCol)
-                    self.legalMoves.append(legalMove)
-                if startCol - 1 >= 0:
-                    if self.board[startRow - 1][startCol - 1][0] != color:
-                        legalMove = (startRow, startCol, startRow - 1, startCol - 1)
-                        self.legalMoves.append(legalMove)
-                if startCol + 1 <= 7:
-                    if self.board[startRow - 1][startCol + 1][0] != color:
-                        legalMove = (startRow, startCol, startRow - 1, startCol + 1)
-                        self.legalMoves.append(legalMove)
-
-            if startRow + 1 <= 7:
-                if self.board[startRow + 1][startCol][0] != color:
-                    legalMove = (startRow, startCol, startRow + 1, startCol)
-                    self.legalMoves.append(legalMove)
-                if startCol - 1 >= 0:
-                    if self.board[startRow + 1][startCol - 1][0] != color:
-                        legalMove = (startRow, startCol, startRow + 1, startCol - 1)
-                        self.legalMoves.append(legalMove)
-                if startCol + 1 <= 7:
-                    if self.board[startRow + 1][startCol + 1][0] != color:
-                        legalMove = (startRow, startCol, startRow + 1, startCol + 1)
-                        self.legalMoves.append(legalMove)
-
-            if startCol - 1 >= 0 and self.board[startRow][startCol - 1][0] != color:
-                legalMove = (startRow, startCol, startRow, startCol - 1)
-                self.legalMoves.append(legalMove)
-
-            if startCol + 1 <= 7 and self.board[startRow][startCol + 1][0] != color:
-                legalMove = (startRow, startCol, startRow, startCol + 1)
-                self.legalMoves.append(legalMove)
-
-
-
-        elif self.whiteToMove == False:
-            color = "b"
-            if startRow - 1 >= 0:
-                if self.board[startRow - 1][startCol][0] != color:
-                    legalMove = (startRow, startCol, startRow - 1, startCol)
-                    self.legalMoves.append(legalMove)
-                if startCol - 1 >= 0:
-                    if self.board[startRow - 1][startCol - 1][0] != color:
-                        legalMove = (startRow, startCol, startRow - 1, startCol - 1)
-                        self.legalMoves.append(legalMove)
-                if startCol + 1 <= 7:
-                    if self.board[startRow - 1][startCol + 1][0] != color:
-                        legalMove = (startRow, startCol, startRow - 1, startCol + 1)
-                        self.legalMoves.append(legalMove)
-
-            if startRow + 1 <= 7:
-                if self.board[startRow + 1][startCol][0] != color:
-                    legalMove = (startRow, startCol, startRow + 1, startCol)
-                    self.legalMoves.append(legalMove)
-                if startCol - 1 >= 0:
-                    if self.board[startRow + 1][startCol - 1][0] != color:
-                        legalMove = (startRow, startCol, startRow + 1, startCol - 1)
-                        self.legalMoves.append(legalMove)
-                if startCol + 1 <= 7:
-                    if self.board[startRow + 1][startCol + 1][0] != color:
-                        legalMove = (startRow, startCol, startRow + 1, startCol + 1)
-                        self.legalMoves.append(legalMove)
-
-            if startCol - 1 >= 0 and self.board[startRow][startCol - 1][0] != color:
-                legalMove = (startRow, startCol, startRow, startCol - 1)
-                self.legalMoves.append(legalMove)
-
-            if startCol + 1 <= 7 and self.board[startRow][startCol + 1][0] != color:
-                legalMove = (startRow, startCol, startRow, startCol + 1)
-                self.legalMoves.append(legalMove)
-
     def checkKingMove(self, startRow, startCol, row, col):
-        if self.whiteToMove == True:
-            oppositeColor = "b"
-        else:
-            oppositeColor = "w"
+        oppositeColor = "b" if self.whiteToMove else "w"
+        directions = [(-1, -1), (-1, 0), (-1, 1),(0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
-        if startRow - 1 >= 0:
-            if startRow - 1 == row and startCol == col:
-                checkMove = (startRow, startCol, startRow - 1, startCol)
-                self.checkKing.append(checkMove)
-            if startCol - 1 >= 0:
-                if startRow - 1 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol - 1)
-                    self.checkKing.append(checkMove)
-            if startCol + 1 <= 7:
-                if startRow - 1 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow - 1, startCol + 1)
-                    self.checkKing.append(checkMove)
+        for dr, dc in directions:
+            newRow, newCol = startRow + dr, startCol + dc
+            if 0 <= newRow < 8 and 0 <= newCol < 8:
+                if self.board[newRow][newCol] == oppositeColor + "K":  # Provjera šaha
+                    self.checkKing.append((startRow, startCol, newRow, newCol))
 
-        if startRow + 1 <= 7:
-            if startRow + 1 == row and startCol == col:
-                checkMove = (startRow, startCol, startRow + 1, startCol)
-                self.checkKing.append(checkMove)
-            if startCol - 1 >= 0:
-                if startRow + 1 == row and startCol - 1 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol - 1)
-                    self.checkKing.append(checkMove)
-            if startCol + 1 <= 7:
-                if startRow + 1 == row and startCol + 1 == col:
-                    checkMove = (startRow, startCol, startRow + 1, startCol + 1)
-                    self.checkKing.append(checkMove)
-
-        if startCol - 1 >= 0 and startRow == row and startCol - 1 == col:
-            checkMove = (startRow, startCol, startRow, startCol - 1)
-            self.checkKing.append(checkMove)
-
-        if startCol + 1 <= 7 and startRow == row and startCol + 1 == col:
-            checkMove = (startRow, startCol, startRow, startCol + 1)
-            self.checkKing.append(checkMove)
+    def castling(self, startRow, startCol):
+        color = "w" if self.whiteToMove else "b"
+        if self.board[startRow][startCol][0] == "w":
+            if self.board[7][5] == "--" and self.board[7][6] == "--" and self.board[7][7] == "wR":
+                self.specificMoves.append((startRow, startCol, 7, 7))
+            if self.board[7][1] == "--" and self.board[7][2] == "--" and self.board[7][3] == "--" and self.board[7][0] == "wR":
+                self.specificMoves.append((startRow, startCol, 7, 0))
+        elif self.board[startRow][startCol][0] == "b":
+            if self.board[0][5] == "--" and self.board[0][6] == "--" and self.board[0][7] == "bR":
+                self.specificMoves.append((startRow, startCol, 0, 7))
+            if self.board[0][1] == "--" and self.board[0][2] == "--" and self.board[0][3] == "--" and self.board[0][0] == "bR":
+                self.specificMoves.append((startRow, startCol, 0, 0))
 
     def get_promotion_choice(self):
-        while True:
-            for event in p.event.get():
-                if event.type == p.KEYDOWN:
-                    if event.key == p.K_q:
-                        return "Q"
-                    elif event.key == p.K_n:
-                        return "N"
-                    elif event.key == p.K_b:
-                        return "B"
-                    elif event.key == p.K_r:
-                        return "R"
+        pass
+        #while True:
+            #for event in p.event.get():
+                #if event.type == p.KEYDOWN:
+                    #if event.key == p.K_q:
+                        #return "Q"
+                    #elif event.key == p.K_n:
+                        #return "N"
+                    #elif event.key == p.K_b:
+                        #return "B"
+                    #elif event.key == p.K_r:
+                        #return "R"
 
-    def castling(self, move):
-        if move.startRow == 7 and move.startCol == 4:
-            if move.endRow == 7 and move.endCol == 7 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
-                    self.board[7][5] == "--" and self.board[7][6] == "--":
-                self.checkCastling(move)
-                if len(self.checkKing) == 0:
-                    self.board[move.startRow][move.startCol] = "--"
-                    self.board[move.endRow][move.endCol] = "--"
-                    self.board[7][6] = move.pieceMoved
-                    self.board[7][5] = "wR"
-                    self.whiteToMove = not self.whiteToMove
-                    self.moves.append(move)
-                    self.whiteKingPosition[0] = move.endRow
-                    self.whiteKingPosition[1] = move.endCol
 
-            elif move.endRow == 7 and move.endCol == 0 and all("wK" not in mv.pieceMoved for mv in self.moves) and \
-                    self.board[7][3] == "--" and self.board[7][2] == "--" and self.board[7][1] == "--":
-                self.checkCastling(move)
-                if len(self.checkKing) == 0:
-                    self.board[move.startRow][move.startCol] = "--"
-                    self.board[move.endRow][move.endCol] = "--"
-                    self.board[7][2] = move.pieceMoved
-                    self.board[7][3] = "wR"
-                    self.whiteToMove = not self.whiteToMove
-                    self.moves.append(move)
-                    self.whiteKingPosition[0] = move.endRow
-                    self.whiteKingPosition[1] = move.endCol
 
-        elif move.startRow == 0 and move.startCol == 4:
-            if move.endRow == 0 and move.endCol == 7 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
-                    self.board[0][5] == "--" and self.board[0][6] == "--":
-                self.checkCastling(move)
-                if len(self.checkKing) == 0:
-                    self.board[move.startRow][move.startCol] = "--"
-                    self.board[move.endRow][move.endCol] = "--"
-                    self.board[0][6] = move.pieceMoved
-                    self.board[0][5] = "bR"
-                    self.whiteToMove = not self.whiteToMove
-                    self.moves.append(move)
-                    self.blackKingPosition[0] = move.endRow
-                    self.blackKingPosition[1] = move.endCol
-
-            elif move.endRow == 0 and move.endCol == 0 and all("bK" not in mv.pieceMoved for mv in self.moves) and \
-                    self.board[0][3] == "--" and self.board[0][2] == "--" and self.board[0][1] == "--":
-                self.checkCastling(move)
-                if len(self.checkKing) == 0:
-                    self.board[move.startRow][move.startCol] = "--"
-                    self.board[move.endRow][move.endCol] = "--"
-                    self.board[0][2] = move.pieceMoved
-                    self.board[0][3] = "bR"
-                    self.whiteToMove = not self.whiteToMove
-                    self.moves.append(move)
-                    self.blackKingPosition[0] = move.endRow
-                    self.blackKingPosition[1] = move.endCol
-
-    def checkCastling(self, move):
-        self.checkKing = []
-        if self.whiteToMove == True:
-            color = "b"
-            self.whiteToMove = not self.whiteToMove
-            for i in range(8):
-                for j in range(8):
-                    if self.board[i][j][0] == color:
-                        if self.board[i][j][1] == "P":
-                            if move.endCol == 7:
-                                self.checkPawnMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkPawnMove(i, j, 7, 5)
-                                self.checkPawnMove(i, j, 7, 6)
-                                self.checkPawnMove(i, j, 7, 7)
-                            else:
-                                self.checkPawnMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkPawnMove(i, j, 7, 0)
-                                self.checkPawnMove(i, j, 7, 1)
-                                self.checkPawnMove(i, j, 7, 2)
-                                self.checkPawnMove(i, j, 7, 3)
-
-                        elif self.board[i][j][1] == "N":
-                            if move.endCol == 7:
-                                self.checkKnightMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkKnightMove(i, j, 7, 5)
-                                self.checkKnightMove(i, j, 7, 6)
-                                self.checkKnightMove(i, j, 7, 7)
-                            else:
-                                self.checkKnightMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkKnightMove(i, j, 7, 0)
-                                self.checkKnightMove(i, j, 7, 1)
-                                self.checkKnightMove(i, j, 7, 2)
-                                self.checkKnightMove(i, j, 7, 3)
-                        elif self.board[i][j][1] == "R":
-                            if move.endCol == 7:
-                                self.checkRockMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkRockMove(i, j, 7, 5)
-                                self.checkRockMove(i, j, 7, 6)
-                                self.checkRockMove(i, j, 7, 7)
-                            else:
-                                self.checkRockMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkRockMove(i, j, 7, 0)
-                                self.checkRockMove(i, j, 7, 1)
-                                self.checkRockMove(i, j, 7, 2)
-                                self.checkRockMove(i, j, 7, 3)
-
-                        elif self.board[i][j][1] == "B":
-                            if move.endCol == 7:
-                                self.checkBishopMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkBishopMove(i, j, 7, 5)
-                                self.checkBishopMove(i, j, 7, 6)
-                                self.checkBishopMove(i, j, 7, 7)
-                            else:
-                                self.checkBishopMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkBishopMove(i, j, 7, 0)
-                                self.checkBishopMove(i, j, 7, 1)
-                                self.checkBishopMove(i, j, 7, 2)
-                                self.checkBishopMove(i, j, 7, 3)
-                        elif self.board[i][j][1] == "Q":
-                            if move.endCol == 7:
-                                self.checkRockMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkRockMove(i, j, 7, 5)
-                                self.checkRockMove(i, j, 7, 6)
-                                self.checkRockMove(i, j, 7, 7)
-                                self.checkBishopMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkBishopMove(i, j, 7, 5)
-                                self.checkBishopMove(i, j, 7, 6)
-                                self.checkBishopMove(i, j, 7, 7)
-                            else:
-                                self.checkRockMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkRockMove(i, j, 7, 0)
-                                self.checkRockMove(i, j, 7, 1)
-                                self.checkRockMove(i, j, 7, 2)
-                                self.checkRockMove(i, j, 7, 3)
-                                self.checkBishopMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-                                self.checkBishopMove(i, j, 7, 0)
-                                self.checkBishopMove(i, j, 7, 1)
-                                self.checkBishopMove(i, j, 7, 2)
-                                self.checkBishopMove(i, j, 7, 3)
-                        elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j, self.whiteKingPosition[0], self.whiteKingPosition[1])
-            self.whiteToMove = not self.whiteToMove
-
-        else:
-            self.whiteToMove = not self.whiteToMove
-            color = "w"
-            for i in range(8):
-                for j in range(8):
-                    if self.board[i][j][0] == color:
-                        if self.board[i][j][1] == "P":
-                            if move.endCol == 7:
-                                self.checkPawnMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkPawnMove(i, j, 0, 5)
-                                self.checkPawnMove(i, j, 0, 6)
-                                self.checkPawnMove(i, j, 0, 7)
-                            else:
-                                self.checkPawnMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkPawnMove(i, j, 0, 0)
-                                self.checkPawnMove(i, j, 0, 1)
-                                self.checkPawnMove(i, j, 0, 2)
-                                self.checkPawnMove(i, j, 0, 3)
-
-                        elif self.board[i][j][1] == "N":
-                            if move.endCol == 7:
-                                self.checkKnightMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkKnightMove(i, j, 0, 5)
-                                self.checkKnightMove(i, j, 0, 6)
-                                self.checkKnightMove(i, j, 0, 7)
-                            else:
-                                self.checkKnightMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkKnightMove(i, j, 0, 0)
-                                self.checkKnightMove(i, j, 0, 1)
-                                self.checkKnightMove(i, j, 0, 2)
-                                self.checkKnightMove(i, j, 0, 3)
-                        elif self.board[i][j][1] == "R":
-                            if move.endCol == 7:
-                                self.checkRockMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkRockMove(i, j, 0, 5)
-                                self.checkRockMove(i, j, 0, 6)
-                                self.checkRockMove(i, j, 0, 7)
-                            else:
-                                self.checkRockMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkRockMove(i, j, 0, 0)
-                                self.checkRockMove(i, j, 0, 1)
-                                self.checkRockMove(i, j, 0, 2)
-                                self.checkRockMove(i, j, 0, 3)
-
-                        elif self.board[i][j][1] == "B":
-                            if move.endCol == 7:
-                                self.checkBishopMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkBishopMove(i, j, 0, 5)
-                                self.checkBishopMove(i, j, 0, 6)
-                                self.checkBishopMove(i, j, 0, 7)
-                            else:
-                                self.checkBishopMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkBishopMove(i, j, 0, 0)
-                                self.checkBishopMove(i, j, 0, 1)
-                                self.checkBishopMove(i, j, 0, 2)
-                                self.checkBishopMove(i, j, 0, 3)
-                        elif self.board[i][j][1] == "Q":
-                            if move.endCol == 7:
-                                self.checkRockMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkRockMove(i, j, 0, 5)
-                                self.checkRockMove(i, j, 0, 6)
-                                self.checkRockMove(i, j, 0, 7)
-                                self.checkBishopMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkBishopMove(i, j, 0, 5)
-                                self.checkBishopMove(i, j, 0, 6)
-                                self.checkBishopMove(i, j, 0, 7)
-                            else:
-                                self.checkRockMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkRockMove(i, j, 0, 0)
-                                self.checkRockMove(i, j, 0, 1)
-                                self.checkRockMove(i, j, 0, 2)
-                                self.checkRockMove(i, j, 0, 3)
-                                self.checkBishopMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-                                self.checkBishopMove(i, j, 0, 0)
-                                self.checkBishopMove(i, j, 0, 1)
-                                self.checkBishopMove(i, j, 0, 2)
-                                self.checkBishopMove(i, j, 0, 3)
-                        elif self.board[i][j][1] == "K":
-                            self.checkKingMove(i, j, self.blackKingPosition[0], self.blackKingPosition[1])
-            self.whiteToMove = not self.whiteToMove
-
-    def elpassantAndPromotion(self, move):
-        if move.startRow == 3 and self.board[move.startRow][move.startCol] == "wP" and (move.endCol == move.startCol - 1 or move.endCol == move.startCol + 1):
+    """def elpassantAndPromotion(self):
+        if self.board[3] == "wP" and (move.endCol == move.startCol - 1 or move.endCol == move.startCol + 1):
                 lastMove = self.moves.pop()
                 self.moves.append(lastMove)
                 if lastMove.pieceMoved == "bP" and lastMove.startRow == 1 and lastMove.endRow == 3 and lastMove.startCol == move.startCol - 1:
@@ -926,8 +482,7 @@ class GameState():
             self.moves.append(move)
             self.checkChecks()
             if len(self.checkKing) > 0:
-                self.undoMove()
-
+                self.undoMove()"""
 
 
 
@@ -951,11 +506,18 @@ class Move():
         self.pieceCaptured = board[self.endRow][self.endCol]
         self.moveId = (self.startRow, self.startCol, self.endRow, self.endCol)
 
+    def __eq__(self, other):
+        if isinstance(other, Move):
+            return self.moveId == other.moveId
+        return False
+
+    def __hash__(self):
+        return hash(self.moveId)
+
     def getChessNotation(self):
         return self.getRankFile(self.startRow, self.startCol) + self.getRankFile(self.endRow, self.endCol)
 
     def getRankFile(self, row, col):
         return self.colsToFiles[col] + self.rowsToRanks[row]
-
 
 
